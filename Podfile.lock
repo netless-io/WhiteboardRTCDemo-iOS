@@ -1,0 +1,32 @@
+PODS:
+  - AgoraRtcEngine_Special_iOS (3.7.2.129.1)
+  - NTLBridge (3.1.6)
+  - White_YYModel (1.0.6)
+  - Whiteboard (2.16.87):
+    - Whiteboard/Whiteboard-Basic (= 2.16.87)
+  - Whiteboard/Resource (2.16.87)
+  - Whiteboard/Whiteboard-Basic (2.16.87):
+    - NTLBridge (~> 3.1.4)
+    - White_YYModel
+    - Whiteboard/Resource
+
+DEPENDENCIES:
+  - AgoraRtcEngine_Special_iOS (= 3.7.2.129.1)
+  - Whiteboard (= 2.16.87)
+
+SPEC REPOS:
+  trunk:
+    - AgoraRtcEngine_Special_iOS
+    - NTLBridge
+    - White_YYModel
+    - Whiteboard
+
+SPEC CHECKSUMS:
+  AgoraRtcEngine_Special_iOS: e04b1ad2a2ef4de49dfd70ab1a05c6a1f8f4f341
+  NTLBridge: 6ef7f3c1fc956f2e2d701a89828d51674bd479c7
+  White_YYModel: 4ed7b231471784ec709d4db954e1ca61a4fbe54d
+  Whiteboard: f95cec11f8359325ccb79d54d1237746acba2de2
+
+PODFILE CHECKSUM: 421522fb29979312e2974a3a03fb4a9aa636b53d
+
+COCOAPODS: 1.13.0
