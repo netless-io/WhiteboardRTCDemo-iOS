@@ -1,5 +1,27 @@
 PODS:
-  - AgoraRtcEngine_Special_iOS (3.7.2.129.1)
+  - AgoraRtcEngine_iOS (3.7.2):
+    - AgoraRtcEngine_iOS/AINS (= 3.7.2)
+    - AgoraRtcEngine_iOS/AV1Dec (= 3.7.2)
+    - AgoraRtcEngine_iOS/ContentInspect (= 3.7.2)
+    - AgoraRtcEngine_iOS/FullAudioFormat (= 3.7.2)
+    - AgoraRtcEngine_iOS/ReplayKit (= 3.7.2)
+    - AgoraRtcEngine_iOS/ROIEnc (= 3.7.2)
+    - AgoraRtcEngine_iOS/RtcBasic (= 3.7.2)
+    - AgoraRtcEngine_iOS/SpatialAudio (= 3.7.2)
+    - AgoraRtcEngine_iOS/SuperResolution (= 3.7.2)
+    - AgoraRtcEngine_iOS/VideoPreprocess (= 3.7.2)
+    - AgoraRtcEngine_iOS/VirtualBackground (= 3.7.2)
+  - AgoraRtcEngine_iOS/AINS (3.7.2)
+  - AgoraRtcEngine_iOS/AV1Dec (3.7.2)
+  - AgoraRtcEngine_iOS/ContentInspect (3.7.2)
+  - AgoraRtcEngine_iOS/FullAudioFormat (3.7.2)
+  - AgoraRtcEngine_iOS/ReplayKit (3.7.2)
+  - AgoraRtcEngine_iOS/ROIEnc (3.7.2)
+  - AgoraRtcEngine_iOS/RtcBasic (3.7.2)
+  - AgoraRtcEngine_iOS/SpatialAudio (3.7.2)
+  - AgoraRtcEngine_iOS/SuperResolution (3.7.2)
+  - AgoraRtcEngine_iOS/VideoPreprocess (3.7.2)
+  - AgoraRtcEngine_iOS/VirtualBackground (3.7.2)
   - NTLBridge (3.1.6)
   - White_YYModel (1.0.6)
   - Whiteboard (2.16.87):
@@ -11,22 +33,22 @@ PODS:
     - Whiteboard/Resource
 
 DEPENDENCIES:
-  - AgoraRtcEngine_Special_iOS (= 3.7.2.129.1)
+  - AgoraRtcEngine_iOS (= 3.7.2)
   - Whiteboard (= 2.16.87)
 
 SPEC REPOS:
   trunk:
-    - AgoraRtcEngine_Special_iOS
+    - AgoraRtcEngine_iOS
     - NTLBridge
     - White_YYModel
     - Whiteboard
 
 SPEC CHECKSUMS:
-  AgoraRtcEngine_Special_iOS: e04b1ad2a2ef4de49dfd70ab1a05c6a1f8f4f341
+  AgoraRtcEngine_iOS: 35387cd8e2131e1e3c3ac6c196818072ad0b9b75
   NTLBridge: 6ef7f3c1fc956f2e2d701a89828d51674bd479c7
   White_YYModel: 4ed7b231471784ec709d4db954e1ca61a4fbe54d
   Whiteboard: f95cec11f8359325ccb79d54d1237746acba2de2
 
-PODFILE CHECKSUM: 421522fb29979312e2974a3a03fb4a9aa636b53d
+PODFILE CHECKSUM: 5dffa0a0ccc3a2afdffae25e6397efec0c013993
 
 COCOAPODS: 1.13.0

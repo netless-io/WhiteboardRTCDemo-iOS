@@ -102,7 +102,7 @@ class MainStageViewController: UIViewController {
         sdkConfig.useMultiViews = true
         sdkConfig.log = true
         sdkConfig.loggerOptions = ["printLevelMask": WhiteSDKLoggerOptionLevelKey.debug.rawValue]
-        let sdk = WhiteSDK(whiteBoardView: whiteboardView, config: sdkConfig, commonCallbackDelegate: self, effectMixerBridgeDelegate: self.whiteboardConfig.pptMix ? self.agoraKit : nil)
+        let sdk = WhiteSDK(whiteBoardView: whiteboardView, config: sdkConfig, commonCallbackDelegate: self, audioMixerBridgeDelegate: self)
         return sdk
     }()
 
@@ -129,6 +129,27 @@ class MainStageViewController: UIViewController {
     }
 }
 
+extension MainStageViewController: WhiteAudioMixerBridgeDelegate {
+    func startAudioMixing(_ filePath: String, loopback: Bool, replace: Bool, cycle: Int) {
+        agoraKit.startAudioMixing(filePath, loopback: loopback, replace: replace, cycle: cycle, startPos: 0)
+    }
+    
+    func stopAudioMixing() {
+        agoraKit.stopAudioMixing()
+    }
+    
+    func pauseAudioMixing() {
+        agoraKit.pauseAudioMixing()
+    }
+    
+    func resumeAudioMixing() {
+        agoraKit.resumeAudioMixing()
+    }
+    
+    func setAudioMixingPosition(_ position: Int) {
+        agoraKit.setAudioMixingPosition(position)
+    }
+}
 
 
 extension MainStageViewController: AgoraRtcEngineDelegate, WhiteCommonCallbackDelegate, WhiteRoomCallbackDelegate {
@@ -139,21 +160,12 @@ extension MainStageViewController: AgoraRtcEngineDelegate, WhiteCommonCallbackDe
     func rtcEngine(_: AgoraRtcEngineKit, connectionChangedTo state: AgoraConnectionStateType, reason: AgoraConnectionChangedReason) {
         append(log: "rtc connection changed \(state), reason: \(reason)")
     }
-
-    func rtcEngineDidAudioEffectFinish(_: AgoraRtcEngineKit, soundId: Int) {
-        sdk.effectMixer?.setEffectFinished(soundId)
-    }
-
-    func rtcEngine(_: AgoraRtcEngineKit, didRequest info: AgoraRtcAudioFileInfo, error _: AgoraAudioFileInfoError) {
-        sdk.effectMixer?.setEffectDurationUpdate(info.filePath, duration: Int(info.durationMs))
-    }
-
-    func rtcEngineDidAudioEffectStateChanged(_: AgoraRtcEngineKit, soundId: Int, state: AgoraAudioEffectStateCode) {
-        sdk.effectMixer?.setEffectSoundId(soundId, stateChanged: state.rawValue)
+    
+    func rtcEngine(_ engine: AgoraRtcEngineKit, localAudioMixingStateDidChanged state: AgoraAudioMixingStateCode, reason: AgoraAudioMixingReasonCode) {
+        sdk.audioMixer?.setMediaState(state.rawValue, errorCode: Int(reason.rawValue))
+        print("audio mixing local state \(state.rawValue), reason: \(reason.rawValue)")
     }
 }
-
-extension AgoraRtcEngineKit: WhiteAudioEffectMixerBridgeDelegate {}
 
 extension AgoraConnectionStateType: CustomStringConvertible {
     public var description: String {
