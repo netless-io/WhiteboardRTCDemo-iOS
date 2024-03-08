@@ -36,6 +36,7 @@ struct ContentView: View {
     @AppStorage("customWhiteboardURL") var customWhiteboardURL: String = ""
 
     @State var status: String = ""
+    @State var showMainStage = false
 
     var body: some View {
         NavigationView {
@@ -46,10 +47,6 @@ struct ContentView: View {
     func mainContentView() -> some View {
         ScrollView {
             VStack {
-                Button("Create New") {
-                    generateNewFromFlatDev()
-                }
-
                 Label {
                     TextField("rtcChannelId", text: $rtcChannelId)
                         .frame(maxWidth: .infinity, alignment: .trailing)
@@ -102,51 +99,149 @@ struct ContentView: View {
                 if useCustomWhiteboardURL {
                     TextField("Input Custom WB URL", text: $customWhiteboardURL)
                         .multilineTextAlignment(.trailing)
-                }
-
-                NavigationLink {
-                    let joinInfo = JoinInfo(
-                        rtcToken: rtcToken,
-                        rtcUID: rtcUid,
-                        whiteboardRoomToken: whiteRoomToken,
-                        whiteboardRoomUUID: whiteRoomUuid,
-                        roomUUID: rtcChannelId,
-                        region: region
-                    )
-                    let whiteboardConfig = WhiteboardConfig(pptMix: usePptEffectMix, customUrl: useCustomWhiteboardURL ? customWhiteboardURL : nil)
-                    MainStageRepresentView(
-                        config:
-                        .init(joinInfo: joinInfo, whiteboardConfig: whiteboardConfig)
-                    )
-                    .toolbar {
-                        ToolbarItemGroup(placement: .navigation) {
-                            Button("Copy Web Link") {
-                                UIPasteboard.general.string = "https://demo.whiteboard.agora.io/room/\(joinInfo.whiteboardRoomUUID)?token=\(joinInfo.whiteboardRoomToken)&region=\(joinInfo.region)"
+                        .onAppear {
+                            if customWhiteboardURL.isEmpty {
+                                customWhiteboardURL = "http://10.6.0.90:8080"
                             }
                         }
-                    }
-                } label: {
-                    Text("Enter Now")
-                }.disabled(
-                    rtcChannelId.isEmpty ||
-                        rtcToken.isEmpty ||
-                        rtcUid == 0 ||
-                        whiteRoomUuid.isEmpty ||
-                        whiteRoomToken.isEmpty
-                )
+                }
 
-                Spacer()
-                Label(
-                    title: { Text("RTC Version") },
-                    icon: { Text(AgoraRtcEngineKit.getSdkVersion()) }
-                )
-                Label(
-                    title: { Text("Whiteboard  Version") },
-                    icon: { Text(WhiteSDK.version()) }
-                )
-                Text(status)
+                HStack {
+                    Button(action: {
+                        generateNewFromFlatDev()
+                    }, label: {
+                        Text("New")
+                        Image(systemName: "plus.square")
+                    })
+                    .foregroundColor(.white)
+                    .font(.headline)
+                    .padding(14)
+                    .background(Capsule().fill(.red))
+
+                    Button {
+                        showMainStage.toggle()
+                    } label: {
+                        Text("Enter Now")
+                            .foregroundColor(.white)
+                            .font(.headline)
+                            .padding(14)
+                            .background(Capsule().fill(.blue))
+                    }
+                    .disabled(
+                        rtcChannelId.isEmpty ||
+                            rtcToken.isEmpty ||
+                            rtcUid == 0 ||
+                            whiteRoomUuid.isEmpty ||
+                            whiteRoomToken.isEmpty
+                    )
+                    .fullScreenCover(isPresented: $showMainStage,
+                           content: {
+                               let joinInfo = JoinInfo(
+                                   rtcToken: rtcToken,
+                                   rtcUID: rtcUid,
+                                   whiteboardRoomToken: whiteRoomToken,
+                                   whiteboardRoomUUID: whiteRoomUuid,
+                                   roomUUID: rtcChannelId,
+                                   region: region
+                               )
+                               let whiteboardConfig = WhiteboardConfig(pptMix: usePptEffectMix, customUrl: useCustomWhiteboardURL ? customWhiteboardURL : nil)
+                               NavigationView {
+                                   MainStageRepresentView(
+                                       config: .init(joinInfo: joinInfo, whiteboardConfig: whiteboardConfig)
+                                   )
+                                   .toolbar {
+                                       ToolbarItemGroup(placement: .navigation) {
+                                           Button("Close") {
+                                               showMainStage = false
+                                           }
+                                           Button("Copy Web Link") {
+                                               UIPasteboard.general.string = "https://demo.whiteboard.agora.io/room/\(joinInfo.whiteboardRoomUUID)?token=\(joinInfo.whiteboardRoomToken)&region=\(joinInfo.region)"
+                                           }
+                                       }
+                                   }
+                               }
+                           })
+                }.padding(.horizontal)
+
+                if #available(iOS 16.0, *) {
+                    let info = JoinInfo(rtcToken: rtcToken, rtcUID: rtcUid, whiteboardRoomToken: whiteRoomToken, whiteboardRoomUUID: whiteRoomUuid, roomUUID: rtcChannelId, region: region)
+                    let str = String(data: try! JSONEncoder().encode(info), encoding: .utf8)!
+                    let _ = UIPasteboard.general.string = str
+                    ShareLink(item: str) {
+                        Text("Copy Info And Share")
+                            .foregroundColor(.white)
+                            .font(.headline)
+                            .padding(14)
+                            .background(Capsule().fill(.blue))
+                    }
+                } else {
+                    Button {
+                        let info = JoinInfo(rtcToken: rtcToken, rtcUID: rtcUid, whiteboardRoomToken: whiteRoomToken, whiteboardRoomUUID: whiteRoomUuid, roomUUID: rtcChannelId, region: region)
+                        let str = String(data: try! JSONEncoder().encode(info), encoding: .utf8)!
+                        UIPasteboard.general.string = str
+                    } label: {
+                        Text("Copy Info")
+                            .foregroundColor(.white)
+                            .font(.headline)
+                            .padding(14)
+                            .background(Capsule().fill(.blue))
+                    }
+                }
+
+                if #available(iOS 16.0, *) {
+                    PasteButton(payloadType: String.self) { strs in
+                        guard let str = strs.first else { return }
+                        applyFromString(str)
+                    }
+                } else {
+                    Button {
+                        guard let str = UIPasteboard.general.string else { return }
+                        applyFromString(str)
+                    } label: {
+                        Text("Get Pasteboard")
+                            .foregroundColor(.white)
+                            .font(.headline)
+                            .padding(14)
+                            .background(Capsule().fill(.blue))
+                    }
+                }
+
+                bottomView()
             }
         }
+    }
+
+    @ViewBuilder
+    func bottomView() -> some View {
+        Label(
+            title: { Text("RTC Version") },
+            icon: { Text(AgoraRtcEngineKit.getSdkVersion()) }
+        )
+        Label(
+            title: { Text("Whiteboard  Version") },
+            icon: { Text(WhiteSDK.version()) }
+        )
+        Text(status)
+    }
+
+    func applyFromString(_: String) {
+        guard let data = UIPasteboard.general.string?.data(using: .utf8) else { return }
+        do {
+            let info = try JSONDecoder().decode(JoinInfo.self, from: data)
+            guard !info.whiteboardRoomUUID.isEmpty else { return }
+            apply(info)
+        } catch {
+            print("get value error \(error)")
+        }
+    }
+
+    func apply(_ info: JoinInfo) {
+        rtcChannelId = info.roomUUID
+        rtcToken = info.rtcToken
+        whiteRoomUuid = info.whiteboardRoomUUID
+        whiteRoomToken = info.whiteboardRoomToken
+        rtcUid = info.rtcUID
+        region = info.region
     }
 
     func generateNewFromFlatDev() {
@@ -161,12 +256,7 @@ struct ContentView: View {
                         let info = try JSONDecoder().decode(JoinInfo.self, from: data)
                         // For old simulator. wtf.
                         status = "Start reqeust"
-                        self.rtcChannelId = info.roomUUID
-                        self.rtcToken = info.rtcToken
-                        self.whiteRoomUuid = info.whiteboardRoomUUID
-                        self.whiteRoomToken = info.whiteboardRoomToken
-                        self.rtcUid = info.rtcUID
-                        self.region = info.region
+                        self.apply(info)
                         self.status = "Reqeust success"
                     }
                 } catch {

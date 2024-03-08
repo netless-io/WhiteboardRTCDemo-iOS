@@ -43,11 +43,14 @@ class MainStageViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
 
+    var useWhiteboard = true
+
     func destory() {
         room?.disconnect()
         agoraKit.leaveChannel()
+        print("destory main stage vc")
     }
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         setup()
@@ -55,7 +58,6 @@ class MainStageViewController: UIViewController {
 
     func setup() {
         view.backgroundColor = .gray
-        view.addSubview(whiteboardView)
         view.addSubview(logView)
 
         agoraKit.joinChannel(byToken: joinInfo.rtcToken, channelId: joinInfo.roomUUID, info: nil, uid: UInt(joinInfo.rtcUID)) { _, _, elapsed in
@@ -64,54 +66,59 @@ class MainStageViewController: UIViewController {
             self.agoraKit.enableVideo()
         }
 
-        let whiteconfig = WhiteRoomConfig(uuid: joinInfo.whiteboardRoomUUID, roomToken: joinInfo.whiteboardRoomToken, uid: "myuid")
-        whiteconfig.isWritable = true
-        sdk.joinRoom(with: whiteconfig, callbacks: self) { _, room, error in
-            if let error {
-                self.append(log: "join room error \(error)")
-                return
+        if useWhiteboard {
+            whiteboardView = {
+                if let url = whiteboardConfig.customUrl {
+                    return WhiteBoardView(customUrl: url)
+                }
+                return WhiteBoardView()
+            }()
+            sdk = {
+                let sdkConfig = WhiteSdkConfiguration(app: "sdfsdf/dsf")
+                sdkConfig.useMultiViews = true
+                sdkConfig.log = true
+                sdkConfig.loggerOptions = ["printLevelMask": WhiteSDKLoggerOptionLevelKey.debug.rawValue]
+                let sdk = WhiteSDK(whiteBoardView: whiteboardView!, config: sdkConfig, commonCallbackDelegate: self, effectMixerBridgeDelegate: self.whiteboardConfig.pptMix ? self.agoraKit : nil)
+                return sdk
+            }()
+
+            view.addSubview(whiteboardView!)
+            let whiteconfig = WhiteRoomConfig(uuid: joinInfo.whiteboardRoomUUID, roomToken: joinInfo.whiteboardRoomToken, uid: "myuid")
+            whiteconfig.isWritable = true
+            sdk!.joinRoom(with: whiteconfig, callbacks: self) { [weak self] _, room, error in
+                guard let self else { return }
+                if let error {
+                    self.append(log: "join room error \(error)")
+                    return
+                }
+                self.append(log: "join room success")
+                self.room = room
             }
-            self.append(log: "join room success")
-            self.room = room
         }
     }
 
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         let ratio = 16.0 / 9.0
-        
         if view.bounds.height > view.bounds.width {
             let whiteboardWidth = view.bounds.width
             let whiteboardHeight = view.bounds.width / ratio
-            whiteboardView.frame = .init(x: 0, y: 0, width: whiteboardWidth, height: whiteboardHeight)
-            
-            let logHeight = view.bounds.height - whiteboardView.bounds.height
+            whiteboardView?.frame = .init(x: 0, y: 0, width: whiteboardWidth, height: whiteboardHeight)
+
+            let logHeight = view.bounds.height - (whiteboardView?.bounds.height ?? 0)
             logView.frame = .init(x: 0, y: view.bounds.height - logHeight, width: view.bounds.width, height: logHeight)
         } else {
             let whiteboardWidth = view.bounds.width / 2
             let whiteboardHeight = view.bounds.width / ratio
-            whiteboardView.frame = .init(x: 0, y: 0, width: whiteboardWidth, height: whiteboardHeight)
-            
-            let logWidth = view.bounds.width - whiteboardView.bounds.width
+            whiteboardView?.frame = .init(x: 0, y: 0, width: whiteboardWidth, height: whiteboardHeight)
+
+            let logWidth = view.bounds.width - (whiteboardView?.bounds.width ?? 0)
             logView.frame = .init(x: whiteboardWidth, y: 0, width: logWidth, height: view.bounds.height)
         }
     }
 
-    lazy var sdk: WhiteSDK = {
-        let sdkConfig = WhiteSdkConfiguration(app: "sdfsdf/dsf")
-        sdkConfig.useMultiViews = true
-        sdkConfig.log = true
-        sdkConfig.loggerOptions = ["printLevelMask": WhiteSDKLoggerOptionLevelKey.debug.rawValue]
-        let sdk = WhiteSDK(whiteBoardView: whiteboardView, config: sdkConfig, commonCallbackDelegate: self, effectMixerBridgeDelegate: self.whiteboardConfig.pptMix ? self.agoraKit : nil)
-        return sdk
-    }()
-
-    lazy var whiteboardView: WhiteBoardView = {
-        if let url = whiteboardConfig.customUrl {
-            return WhiteBoardView(customUrl: url)
-        }
-        return WhiteBoardView()
-    }()
+    var sdk: WhiteSDK?
+    var whiteboardView: WhiteBoardView?
 
     lazy var logView: UITextView = {
         let view = UITextView(frame: .zero)
@@ -129,27 +136,30 @@ class MainStageViewController: UIViewController {
     }
 }
 
-
-
 extension MainStageViewController: AgoraRtcEngineDelegate, WhiteCommonCallbackDelegate, WhiteRoomCallbackDelegate {
-    func logger(_ dict: [AnyHashable : Any]) {
-        append(log: dict.description)
+    func logger(_ dict: [AnyHashable: Any]) {
+        if let consoleLog = dict["[WhiteWKConsole]"] as? String {
+            append(log: "console: \(consoleLog)")
+        } else {
+            append(log: dict.description)
+        }
     }
-    
+
     func rtcEngine(_: AgoraRtcEngineKit, connectionChangedTo state: AgoraConnectionStateType, reason: AgoraConnectionChangedReason) {
-        append(log: "rtc connection changed \(state), reason: \(reason)")
+        append(log: "/State/RTC Connect/ state: \(state.description) reason: \(reason.description)")
     }
 
     func rtcEngineDidAudioEffectFinish(_: AgoraRtcEngineKit, soundId: Int) {
-        sdk.effectMixer?.setEffectFinished(soundId)
+        sdk?.effectMixer?.setEffectFinished(soundId)
     }
 
     func rtcEngine(_: AgoraRtcEngineKit, didRequest info: AgoraRtcAudioFileInfo, error _: AgoraAudioFileInfoError) {
-        sdk.effectMixer?.setEffectDurationUpdate(info.filePath, duration: Int(info.durationMs))
+        sdk?.effectMixer?.setEffectDurationUpdate(info.filePath, duration: Int(info.durationMs))
     }
 
     func rtcEngineDidAudioEffectStateChanged(_: AgoraRtcEngineKit, soundId: Int, state: AgoraAudioEffectStateCode) {
-        sdk.effectMixer?.setEffectSoundId(soundId, stateChanged: state.rawValue)
+        sdk?.effectMixer?.setEffectSoundId(soundId, stateChanged: state.rawValue)
+        print("/State/ soundId:\(soundId), state:\(state.rawValue)")
     }
 }
 
