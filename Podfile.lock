@@ -9,10 +9,12 @@ PODS:
     - NTLBridge (~> 3.1.4)
     - White_YYModel
     - Whiteboard/Resource
+  - Zip (2.1.2)
 
 DEPENDENCIES:
   - AgoraRtcEngine_Special_iOS (= 3.7.2.129.1)
   - Whiteboard (= 2.16.87)
+  - Zip
 
 SPEC REPOS:
   trunk:
@@ -20,13 +22,15 @@ SPEC REPOS:
     - NTLBridge
     - White_YYModel
     - Whiteboard
+    - Zip
 
 SPEC CHECKSUMS:
   AgoraRtcEngine_Special_iOS: e04b1ad2a2ef4de49dfd70ab1a05c6a1f8f4f341
   NTLBridge: 6ef7f3c1fc956f2e2d701a89828d51674bd479c7
   White_YYModel: 4ed7b231471784ec709d4db954e1ca61a4fbe54d
   Whiteboard: f95cec11f8359325ccb79d54d1237746acba2de2
+  Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
 
-PODFILE CHECKSUM: 421522fb29979312e2974a3a03fb4a9aa636b53d
+PODFILE CHECKSUM: 4959841a477bd0329bb9708e2becba1503fbe0a9
 
 COCOAPODS: 1.13.0
