@@ -18,7 +18,7 @@ struct MainStageRepresentView: UIViewControllerRepresentable {
     let config: MainStageViewConfig
 
     static func dismantleUIViewController(_ uiViewController: MainStageViewController, coordinator _: ()) {
-        uiViewController.destory()
+        uiViewController.destroy()
     }
 
     func makeUIViewController(context _: Context) -> MainStageViewController {
@@ -34,6 +34,7 @@ struct ContentView: View {
     @AppStorage("region") var region: String = ""
     @AppStorage("whiteRoomToken") var whiteRoomToken: String = ""
     @AppStorage("usePptEffectMix") var usePptEffectMix: Bool = true
+    @AppStorage("useWhiteboard") var useWhiteboard: Bool = true
 
     @AppStorage("useCustomWhiteboardURL") var useCustomWhiteboardURL: Bool = false
     @AppStorage("customWhiteboardURL") var customWhiteboardURL: String = ""
@@ -105,16 +106,18 @@ struct ContentView: View {
                                  let whiteboardConfig = WhiteboardConfig(pptMix: usePptEffectMix, customUrl: useCustomWhiteboardURL ? customWhiteboardURL : nil)
                                  NavigationView {
                                      MainStageRepresentView(
-                                         config: .init(joinInfo: joinInfo, whiteboardConfig: whiteboardConfig)
+                                         config: .init(joinInfo: joinInfo, whiteboardConfig: whiteboardConfig, useWhiteboard: useWhiteboard)
                                      )
                                      .toolbar {
                                          ToolbarItemGroup(placement: .navigation) {
-                                             Button("Close") {
-                                                 showMainStage = false
-                                             }
-                                             Button("Copy Web Link") {
-                                                 UIPasteboard.general.string = "https://demo.whiteboard.agora.io/room/\(joinInfo.whiteboardRoomUUID)?token=\(joinInfo.whiteboardRoomToken)&region=\(joinInfo.region)"
-                                             }
+                                             Group {
+                                                 Button("Close") {
+                                                     showMainStage = false
+                                                 }
+                                                 Button("Copy Web Link") {
+                                                     UIPasteboard.general.string = "https://demo.whiteboard.agora.io/room/\(joinInfo.whiteboardRoomUUID)?token=\(joinInfo.whiteboardRoomToken)&region=\(joinInfo.region)"
+                                                 }
+                                             }.foregroundColor(.blue)
                                          }
                                      }
                                  }
@@ -143,7 +146,7 @@ struct ContentView: View {
                         .background(Capsule().fill(.blue))
                 }
             }
-            
+
             if #available(iOS 16.0, *) {
                 PasteButton(payloadType: String.self) { strs in
                     guard let str = strs.first else { return }
@@ -179,7 +182,7 @@ struct ContentView: View {
                     } label: {
                         Text("Clear AgoraLog")
                     }
-                    
+
                     Button {
                         if FileManager.default.fileExists(atPath: zipUrl.path) {
                             try? FileManager.default.removeItem(at: zipUrl)
@@ -192,7 +195,7 @@ struct ContentView: View {
                     } label: {
                         Text("Zip AgoraLog")
                     }
-                    
+
                     ShareLink(item: zipUrl) {
                         Text("Export AgoraLog")
                     }
@@ -252,6 +255,7 @@ struct ContentView: View {
             Text("WhiteRoom region")
         }
         Toggle("PptEffectMix", isOn: $usePptEffectMix)
+        Toggle("UseWhiteboard", isOn: $useWhiteboard)
 
         Toggle("Custom WB URL", isOn: $useCustomWhiteboardURL)
         if useCustomWhiteboardURL {
@@ -293,6 +297,7 @@ struct ContentView: View {
         if rtcOnly {
             rtcChannelId = info.roomUUID
             rtcToken = info.rtcToken
+            rtcUid = info.rtcUID
             return
         }
         rtcChannelId = info.roomUUID

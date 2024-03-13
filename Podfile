@@ -7,7 +7,7 @@ target 'WhiteboardRTCDemo' do
 
   # Pods for WhiteboardRTCDemo
 
-pod 'Whiteboard', '2.16.87'
+pod 'Whiteboard', :git => 'https://github.com/netless-io/whiteboard-ios.git'
 pod 'AgoraRtcEngine_Special_iOS', '3.7.2.129.1'
 pod 'Zip'
 
