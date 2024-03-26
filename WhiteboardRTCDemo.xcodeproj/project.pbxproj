@@ -69,6 +69,7 @@
 		8A5BA4EB2B6C976700D531E9 /* WhiteboardRTCDemo */ = {
 			isa = PBXGroup;
 			children = (
+				8A37CB782BAD5C6E0097727D /* Info.plist */,
 				8A5BA4EC2B6C976700D531E9 /* WhiteboardRTCDemoApp.swift */,
 				8A5BA4FA2B6CD0FD00D531E9 /* MainStageViewController.swift */,
 				8A5BA4EE2B6C976700D531E9 /* ContentView.swift */,
@@ -349,6 +350,7 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = WhiteboardRTCDemo/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "白板混音测试";
 				INFOPLIST_KEY_NSCameraUsageDescription = sdfsdf;
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = sdfsdf;
@@ -384,6 +386,7 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = WhiteboardRTCDemo/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "白板混音测试";
 				INFOPLIST_KEY_NSCameraUsageDescription = sdfsdf;
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = sdfsdf;

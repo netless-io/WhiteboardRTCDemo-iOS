@@ -66,6 +66,7 @@ class MainStageViewController: UIViewController {
         view.backgroundColor = .gray
         view.addSubview(logView)
 
+        agoraKit.setParameters("{\"che.audio.use_ffmpeg_audio_decoder_effect\": true}")
         agoraKit.joinChannel(byToken: joinInfo.rtcToken, channelId: joinInfo.roomUUID, info: nil, uid: UInt(joinInfo.rtcUID)) { [weak self] _, _, elapsed in
             guard let self else { return }
             self.append(log: "join rtc elapsed \(elapsed)")
@@ -86,11 +87,16 @@ class MainStageViewController: UIViewController {
                 sdkConfig.log = true
                 sdkConfig.loggerOptions = ["printLevelMask": WhiteSDKLoggerOptionLevelKey.debug.rawValue]
                 let sdk = WhiteSDK(whiteBoardView: whiteboardView!, config: sdkConfig, commonCallbackDelegate: self, effectMixerBridgeDelegate: self.whiteboardConfig.pptMix ? self : nil)
+                sdk.setParameters(["effectMixingForMediaPlayer": true])
                 return sdk
             }()
 
             view.addSubview(whiteboardView!)
             let whiteconfig = WhiteRoomConfig(uuid: joinInfo.whiteboardRoomUUID, roomToken: joinInfo.whiteboardRoomToken, uid: "myuid")
+            let windowParams = WhiteWindowParams()
+            windowParams.debug = true
+            whiteconfig.windowParams = windowParams
+          
             whiteconfig.isWritable = true
             sdk!.joinRoom(with: whiteconfig, callbacks: self) { [weak self] _, room, error in
                 guard let self else { return }
@@ -135,12 +141,19 @@ class MainStageViewController: UIViewController {
     }()
 
     func append(log: String) {
-        logView.text.append("\(Date()) : " + log + "\n")
+        let str = dateFormatter.string(from: Date())
+        logView.text.append("\(str) " + log + "\n")
         print(log)
         if !logView.isDragging {
             logView.setContentOffset(.init(x: 0, y: logView.contentSize.height - logView.bounds.height), animated: true)
         }
     }
+    lazy var dateFormatter = {
+        let f = DateFormatter()
+        f.dateFormat = .none
+        f.timeStyle = .medium
+        return f
+    }()
 }
 
 extension MainStageViewController: AgoraRtcEngineDelegate, WhiteCommonCallbackDelegate, WhiteRoomCallbackDelegate {
@@ -183,8 +196,12 @@ extension MainStageViewController: WhiteAudioEffectMixerBridgeDelegate {
         agoraKit.setVolumeOfEffect(soundId, withVolume: volume)
     }
 
-    func playEffect(_ soundId: Int32, filePath: String?, loopCount: Int32, pitch: Double, pan: Double, gain: Double, publish: Bool, startPos: Int32) -> Int32 {
-        agoraKit.playEffect(soundId, filePath: filePath, loopCount: loopCount, pitch: pitch, pan: pan, gain: gain, publish: publish, startPos: startPos)
+    func playEffect(_ soundId: Int32, filePath: String?, loopCount: Int32, pitch: Double, pan: Double, gain: Double, publish: Bool, startPos: Int32, identifier: String) -> Int32 {
+        if identifier == "mediaPlayer" {
+            return agoraKit.playEffect(soundId, filePath: filePath, loopCount: loopCount, pitch: pitch, pan: pan, gain: gain, publish: publish)
+        } else {
+            return agoraKit.playEffect(soundId, filePath: filePath, loopCount: loopCount, pitch: pitch, pan: pan, gain: gain, publish: publish, startPos: startPos)
+        }
     }
 
     func stopEffect(_ soundId: Int32) -> Int32 {
