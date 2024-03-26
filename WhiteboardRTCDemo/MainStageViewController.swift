@@ -17,6 +17,7 @@ struct WhiteboardConfig {
 struct MainStageViewConfig {
     let joinInfo: JoinInfo
     let whiteboardConfig: WhiteboardConfig
+    let useWhiteboard: Bool
 }
 
 class MainStageViewController: UIViewController {
@@ -27,6 +28,7 @@ class MainStageViewController: UIViewController {
     init(config: MainStageViewConfig) {
         joinInfo = config.joinInfo
         whiteboardConfig = config.whiteboardConfig
+        useWhiteboard = config.useWhiteboard
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -43,11 +45,18 @@ class MainStageViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func destory() {
+    let useWhiteboard: Bool
+
+    deinit {
+        print("destory main stage vc deinit")
+        destroy()
+    }
+
+    func destroy() {
         room?.disconnect()
         agoraKit.leaveChannel()
     }
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         setup()
@@ -55,63 +64,68 @@ class MainStageViewController: UIViewController {
 
     func setup() {
         view.backgroundColor = .gray
-        view.addSubview(whiteboardView)
         view.addSubview(logView)
 
-        agoraKit.joinChannel(byToken: joinInfo.rtcToken, channelId: joinInfo.roomUUID, info: nil, uid: UInt(joinInfo.rtcUID)) { _, _, elapsed in
+        agoraKit.joinChannel(byToken: joinInfo.rtcToken, channelId: joinInfo.roomUUID, info: nil, uid: UInt(joinInfo.rtcUID)) { [weak self] _, _, elapsed in
+            guard let self else { return }
             self.append(log: "join rtc elapsed \(elapsed)")
             self.agoraKit.enableAudio()
             self.agoraKit.enableVideo()
         }
 
-        let whiteconfig = WhiteRoomConfig(uuid: joinInfo.whiteboardRoomUUID, roomToken: joinInfo.whiteboardRoomToken, uid: "myuid")
-        whiteconfig.isWritable = true
-        sdk.joinRoom(with: whiteconfig, callbacks: self) { _, room, error in
-            if let error {
-                self.append(log: "join room error \(error)")
-                return
+        if useWhiteboard {
+            whiteboardView = {
+                if let url = whiteboardConfig.customUrl {
+                    return WhiteBoardView(customUrl: url)
+                }
+                return WhiteBoardView()
+            }()
+            sdk = {
+                let sdkConfig = WhiteSdkConfiguration(app: "sdfsdf/dsf")
+                sdkConfig.useMultiViews = true
+                sdkConfig.log = true
+                sdkConfig.loggerOptions = ["printLevelMask": WhiteSDKLoggerOptionLevelKey.debug.rawValue]
+                let sdk = WhiteSDK(whiteBoardView: whiteboardView!, config: sdkConfig, commonCallbackDelegate: self, effectMixerBridgeDelegate: self.whiteboardConfig.pptMix ? self : nil)
+                return sdk
+            }()
+
+            view.addSubview(whiteboardView!)
+            let whiteconfig = WhiteRoomConfig(uuid: joinInfo.whiteboardRoomUUID, roomToken: joinInfo.whiteboardRoomToken, uid: "myuid")
+            whiteconfig.isWritable = true
+            sdk!.joinRoom(with: whiteconfig, callbacks: self) { [weak self] _, room, error in
+                guard let self else { return }
+                if let error {
+                    self.append(log: "join room error \(error)")
+                    return
+                }
+                self.append(log: "join room success")
+                self.room = room
             }
-            self.append(log: "join room success")
-            self.room = room
         }
     }
 
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         let ratio = 16.0 / 9.0
-        
         if view.bounds.height > view.bounds.width {
             let whiteboardWidth = view.bounds.width
             let whiteboardHeight = view.bounds.width / ratio
-            whiteboardView.frame = .init(x: 0, y: 0, width: whiteboardWidth, height: whiteboardHeight)
-            
-            let logHeight = view.bounds.height - whiteboardView.bounds.height
+            whiteboardView?.frame = .init(x: 0, y: 0, width: whiteboardWidth, height: whiteboardHeight)
+
+            let logHeight = view.bounds.height - (whiteboardView?.bounds.height ?? 0)
             logView.frame = .init(x: 0, y: view.bounds.height - logHeight, width: view.bounds.width, height: logHeight)
         } else {
             let whiteboardWidth = view.bounds.width / 2
             let whiteboardHeight = view.bounds.width / ratio
-            whiteboardView.frame = .init(x: 0, y: 0, width: whiteboardWidth, height: whiteboardHeight)
-            
-            let logWidth = view.bounds.width - whiteboardView.bounds.width
+            whiteboardView?.frame = .init(x: 0, y: 0, width: whiteboardWidth, height: whiteboardHeight)
+
+            let logWidth = view.bounds.width - (whiteboardView?.bounds.width ?? 0)
             logView.frame = .init(x: whiteboardWidth, y: 0, width: logWidth, height: view.bounds.height)
         }
     }
 
-    lazy var sdk: WhiteSDK = {
-        let sdkConfig = WhiteSdkConfiguration(app: "sdfsdf/dsf")
-        sdkConfig.useMultiViews = true
-        sdkConfig.log = true
-        sdkConfig.loggerOptions = ["printLevelMask": WhiteSDKLoggerOptionLevelKey.debug.rawValue]
-        let sdk = WhiteSDK(whiteBoardView: whiteboardView, config: sdkConfig, commonCallbackDelegate: self, audioMixerBridgeDelegate: self)
-        return sdk
-    }()
-
-    lazy var whiteboardView: WhiteBoardView = {
-        if let url = whiteboardConfig.customUrl {
-            return WhiteBoardView(customUrl: url)
-        }
-        return WhiteBoardView()
-    }()
+    var sdk: WhiteSDK?
+    weak var whiteboardView: WhiteBoardView?
 
     lazy var logView: UITextView = {
         let view = UITextView(frame: .zero)
@@ -129,41 +143,92 @@ class MainStageViewController: UIViewController {
     }
 }
 
-extension MainStageViewController: WhiteAudioMixerBridgeDelegate {
-    func startAudioMixing(_ filePath: String, loopback: Bool, replace: Bool, cycle: Int) {
-        agoraKit.startAudioMixing(filePath, loopback: loopback, replace: replace, cycle: cycle, startPos: 0)
+extension MainStageViewController: AgoraRtcEngineDelegate, WhiteCommonCallbackDelegate, WhiteRoomCallbackDelegate {
+    func logger(_ dict: [AnyHashable: Any]) {
+        if let consoleLog = dict["[WhiteWKConsole]"] as? String {
+            append(log: "console: \(consoleLog)")
+        } else {
+            append(log: dict.description)
+        }
     }
-    
-    func stopAudioMixing() {
-        agoraKit.stopAudioMixing()
+
+    func rtcEngine(_: AgoraRtcEngineKit, connectionChangedTo state: AgoraConnectionStateType, reason: AgoraConnectionChangedReason) {
+        append(log: "/State/RTC Connect/ state: \(state.description) reason: \(reason.description)")
     }
-    
-    func pauseAudioMixing() {
-        agoraKit.pauseAudioMixing()
+
+    func rtcEngineDidAudioEffectFinish(_: AgoraRtcEngineKit, soundId: Int) {
+        sdk?.effectMixer?.setEffectFinished(soundId)
     }
-    
-    func resumeAudioMixing() {
-        agoraKit.resumeAudioMixing()
+
+    func rtcEngine(_: AgoraRtcEngineKit, didRequest info: AgoraRtcAudioFileInfo, error _: AgoraAudioFileInfoError) {
+        sdk?.effectMixer?.setEffectDurationUpdate(info.filePath, duration: Int(info.durationMs))
     }
-    
-    func setAudioMixingPosition(_ position: Int) {
-        agoraKit.setAudioMixingPosition(position)
+
+    func rtcEngineDidAudioEffectStateChanged(_: AgoraRtcEngineKit, soundId: Int, state: AgoraAudioEffectStateCode) {
+        sdk?.effectMixer?.setEffectSoundId(soundId, stateChanged: state.rawValue)
+        print("/State/ soundId:\(soundId), state:\(state.rawValue)")
     }
 }
 
+extension MainStageViewController: WhiteAudioEffectMixerBridgeDelegate {
+    func getEffectsVolume() -> Double {
+        agoraKit.getEffectsVolume()
+    }
 
-extension MainStageViewController: AgoraRtcEngineDelegate, WhiteCommonCallbackDelegate, WhiteRoomCallbackDelegate {
-    func logger(_ dict: [AnyHashable : Any]) {
-        append(log: dict.description)
+    func setEffectsVolume(_ volume: Double) -> Int32 {
+        agoraKit.setEffectsVolume(volume)
     }
-    
-    func rtcEngine(_: AgoraRtcEngineKit, connectionChangedTo state: AgoraConnectionStateType, reason: AgoraConnectionChangedReason) {
-        append(log: "rtc connection changed \(state), reason: \(reason)")
+
+    func setVolumeOfEffect(_ soundId: Int32, withVolume volume: Double) -> Int32 {
+        agoraKit.setVolumeOfEffect(soundId, withVolume: volume)
     }
-    
-    func rtcEngine(_ engine: AgoraRtcEngineKit, localAudioMixingStateDidChanged state: AgoraAudioMixingStateCode, reason: AgoraAudioMixingReasonCode) {
-        sdk.audioMixer?.setMediaState(state.rawValue, errorCode: Int(reason.rawValue))
-        print("audio mixing local state \(state.rawValue), reason: \(reason.rawValue)")
+
+    func playEffect(_ soundId: Int32, filePath: String?, loopCount: Int32, pitch: Double, pan: Double, gain: Double, publish: Bool, startPos: Int32) -> Int32 {
+        agoraKit.playEffect(soundId, filePath: filePath, loopCount: loopCount, pitch: pitch, pan: pan, gain: gain, publish: publish, startPos: startPos)
+    }
+
+    func stopEffect(_ soundId: Int32) -> Int32 {
+        agoraKit.stopEffect(soundId)
+    }
+
+    func stopAllEffects() -> Int32 {
+        agoraKit.stopAllEffects()
+    }
+
+    func preloadEffect(_ soundId: Int32, filePath: String?) -> Int32 {
+        agoraKit.preloadEffect(soundId, filePath: filePath)
+    }
+
+    func unloadEffect(_ soundId: Int32) -> Int32 {
+        agoraKit.unloadEffect(soundId)
+    }
+
+    func pauseEffect(_ soundId: Int32) -> Int32 {
+        agoraKit.pauseEffect(soundId)
+    }
+
+    func pauseAllEffects() -> Int32 {
+        agoraKit.pauseAllEffects()
+    }
+
+    func resumeEffect(_ soundId: Int32) -> Int32 {
+        agoraKit.resumeEffect(soundId)
+    }
+
+    func resumeAllEffects() -> Int32 {
+        agoraKit.resumeAllEffects()
+    }
+
+    func setEffectPosition(_ soundId: Int32, pos: Int) -> Int32 {
+        agoraKit.setEffectPosition(soundId, pos: pos)
+    }
+
+    func getEffectCurrentPosition(_ soundId: Int32) -> Int32 {
+        agoraKit.getEffectCurrentPosition(soundId)
+    }
+
+    func getEffectDuration(_ filePath: String) -> Int32 {
+        agoraKit.getEffectDuration(filePath)
     }
 }
 

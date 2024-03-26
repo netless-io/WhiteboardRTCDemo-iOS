@@ -349,6 +349,7 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "白板混音测试";
 				INFOPLIST_KEY_NSCameraUsageDescription = sdfsdf;
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = sdfsdf;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -383,6 +384,7 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "白板混音测试";
 				INFOPLIST_KEY_NSCameraUsageDescription = sdfsdf;
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = sdfsdf;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;

@@ -1,54 +1,36 @@
 PODS:
-  - AgoraRtcEngine_iOS (3.7.2):
-    - AgoraRtcEngine_iOS/AINS (= 3.7.2)
-    - AgoraRtcEngine_iOS/AV1Dec (= 3.7.2)
-    - AgoraRtcEngine_iOS/ContentInspect (= 3.7.2)
-    - AgoraRtcEngine_iOS/FullAudioFormat (= 3.7.2)
-    - AgoraRtcEngine_iOS/ReplayKit (= 3.7.2)
-    - AgoraRtcEngine_iOS/ROIEnc (= 3.7.2)
-    - AgoraRtcEngine_iOS/RtcBasic (= 3.7.2)
-    - AgoraRtcEngine_iOS/SpatialAudio (= 3.7.2)
-    - AgoraRtcEngine_iOS/SuperResolution (= 3.7.2)
-    - AgoraRtcEngine_iOS/VideoPreprocess (= 3.7.2)
-    - AgoraRtcEngine_iOS/VirtualBackground (= 3.7.2)
-  - AgoraRtcEngine_iOS/AINS (3.7.2)
-  - AgoraRtcEngine_iOS/AV1Dec (3.7.2)
-  - AgoraRtcEngine_iOS/ContentInspect (3.7.2)
-  - AgoraRtcEngine_iOS/FullAudioFormat (3.7.2)
-  - AgoraRtcEngine_iOS/ReplayKit (3.7.2)
-  - AgoraRtcEngine_iOS/ROIEnc (3.7.2)
-  - AgoraRtcEngine_iOS/RtcBasic (3.7.2)
-  - AgoraRtcEngine_iOS/SpatialAudio (3.7.2)
-  - AgoraRtcEngine_iOS/SuperResolution (3.7.2)
-  - AgoraRtcEngine_iOS/VideoPreprocess (3.7.2)
-  - AgoraRtcEngine_iOS/VirtualBackground (3.7.2)
+  - AgoraRtcEngine_Special_iOS (3.7.2.129.1)
   - NTLBridge (3.1.6)
   - White_YYModel (1.0.6)
-  - Whiteboard (2.16.87):
-    - Whiteboard/Whiteboard-Basic (= 2.16.87)
-  - Whiteboard/Resource (2.16.87)
-  - Whiteboard/Whiteboard-Basic (2.16.87):
+  - Whiteboard (2.16.88):
+    - Whiteboard/Whiteboard-Basic (= 2.16.88)
+  - Whiteboard/Resource (2.16.88)
+  - Whiteboard/Whiteboard-Basic (2.16.88):
     - NTLBridge (~> 3.1.4)
     - White_YYModel
     - Whiteboard/Resource
+  - Zip (2.1.2)
 
 DEPENDENCIES:
-  - AgoraRtcEngine_iOS (= 3.7.2)
-  - Whiteboard (= 2.16.87)
+  - AgoraRtcEngine_Special_iOS (= 3.7.2.129.1)
+  - Whiteboard (= 2.16.88)
+  - Zip
 
 SPEC REPOS:
   trunk:
-    - AgoraRtcEngine_iOS
+    - AgoraRtcEngine_Special_iOS
     - NTLBridge
     - White_YYModel
     - Whiteboard
+    - Zip
 
 SPEC CHECKSUMS:
-  AgoraRtcEngine_iOS: 35387cd8e2131e1e3c3ac6c196818072ad0b9b75
+  AgoraRtcEngine_Special_iOS: e04b1ad2a2ef4de49dfd70ab1a05c6a1f8f4f341
   NTLBridge: 6ef7f3c1fc956f2e2d701a89828d51674bd479c7
   White_YYModel: 4ed7b231471784ec709d4db954e1ca61a4fbe54d
-  Whiteboard: f95cec11f8359325ccb79d54d1237746acba2de2
+  Whiteboard: 5e4e233548e7a42409cbe4642c0332717dd3e6f5
+  Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
 
-PODFILE CHECKSUM: 5dffa0a0ccc3a2afdffae25e6397efec0c013993
+PODFILE CHECKSUM: 4c0729b6473f88b2938b0353c5c97e3083e5ce78
 
 COCOAPODS: 1.13.0
