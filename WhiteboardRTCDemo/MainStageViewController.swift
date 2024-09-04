@@ -57,6 +57,12 @@ class MainStageViewController: UIViewController {
         agoraKit.leaveChannel()
     }
 
+    @objc func test() {
+        //            manager.addApp({kind: "MediaPlayer", attributes: {src: "https://elephant-pro-live-oss.tongxinyizhi.com/coursePptResource/public/6dac2304-e703-4606-9662-2b4b229993a2.mp4"}})
+        self.agoraKit.playEffect(99999, filePath: "https://apaas-cn.oss-cn-shanghai.aliyuncs.com/demo/cloud-disk/47b7535dcb9a4bb4aa592115266eae98/741719_1/193340ef84f84e4e912ec8d463d42763.mp4", loopCount: 0, pitch: 1, pan: 0, gain: 100, publish: true)
+        self.agoraKit.pauseEffect(99999)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setup()
@@ -72,6 +78,12 @@ class MainStageViewController: UIViewController {
             self.append(log: "join rtc elapsed \(elapsed)")
             self.agoraKit.enableAudio()
             self.agoraKit.enableVideo()
+            
+            let btn = UIButton(type: .system)
+            btn.setTitle("Test", for: .normal)
+            btn.addTarget(self, action: #selector(test), for: .touchUpInside)
+            self.view.addSubview(btn)
+            btn.frame = .init(x: 0, y: 0, width: 88, height: 88)
         }
 
         if useWhiteboard {
@@ -87,7 +99,9 @@ class MainStageViewController: UIViewController {
                 sdkConfig.log = true
                 sdkConfig.loggerOptions = ["printLevelMask": WhiteSDKLoggerOptionLevelKey.debug.rawValue]
                 let sdk = WhiteSDK(whiteBoardView: whiteboardView!, config: sdkConfig, commonCallbackDelegate: self, effectMixerBridgeDelegate: self.whiteboardConfig.pptMix ? self : nil)
-                sdk.setParameters(["effectMixingForMediaPlayer": true])
+                if self.whiteboardConfig.pptMix {
+                    sdk.setParameters(["effectMixingForMediaPlayer": true])
+                }
                 return sdk
             }()
 

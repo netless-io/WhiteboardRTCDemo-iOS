@@ -15,6 +15,19 @@
 		8A5BA4FB2B6CD0FD00D531E9 /* MainStageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A5BA4FA2B6CD0FD00D531E9 /* MainStageViewController.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		8AE2359A2C6DDEE200BDAFA1 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		1ED8E3E7FFCFD468D530B658 /* Pods-WhiteboardRTCDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-WhiteboardRTCDemo.release.xcconfig"; path = "Target Support Files/Pods-WhiteboardRTCDemo/Pods-WhiteboardRTCDemo.release.xcconfig"; sourceTree = "<group>"; };
 		8A5BA4E92B6C976700D531E9 /* WhiteboardRTCDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WhiteboardRTCDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -69,9 +82,9 @@
 		8A5BA4EB2B6C976700D531E9 /* WhiteboardRTCDemo */ = {
 			isa = PBXGroup;
 			children = (
-				8A37CB782BAD5C6E0097727D /* Info.plist */,
 				8A5BA4EC2B6C976700D531E9 /* WhiteboardRTCDemoApp.swift */,
 				8A5BA4FA2B6CD0FD00D531E9 /* MainStageViewController.swift */,
+				8AE235882C6DDEAE00BDAFA1 /* libs */,
 				8A5BA4EE2B6C976700D531E9 /* ContentView.swift */,
 				8A5BA4F02B6C976800D531E9 /* Assets.xcassets */,
 				8A5BA4F22B6C976800D531E9 /* Preview Content */,
@@ -85,6 +98,13 @@
 				8A5BA4F32B6C976800D531E9 /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		8AE235882C6DDEAE00BDAFA1 /* libs */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = libs;
 			sourceTree = "<group>";
 		};
 		F4C64DCE6DE4700659F2EEC4 /* Frameworks */ = {
@@ -107,6 +127,7 @@
 				8A5BA4E62B6C976700D531E9 /* Frameworks */,
 				8A5BA4E72B6C976700D531E9 /* Resources */,
 				DE5622EA93C84DB2A61D8073 /* [CP] Embed Pods Frameworks */,
+				8AE2359A2C6DDEE200BDAFA1 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
