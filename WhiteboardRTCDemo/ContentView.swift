@@ -33,7 +33,8 @@ struct ContentView: View {
     @AppStorage("whiteRoomUuid") var whiteRoomUuid: String = ""
     @AppStorage("region") var region: String = ""
     @AppStorage("whiteRoomToken") var whiteRoomToken: String = ""
-    @AppStorage("usePptEffectMix") var usePptEffectMix: Bool = true
+    @AppStorage("usePptEffectMix") var usePptEffectMix: Bool = false
+    @AppStorage("usePcm") var usePcm: Bool = true
     @AppStorage("useWhiteboard") var useWhiteboard: Bool = true
 
     @AppStorage("useCustomWhiteboardURL") var useCustomWhiteboardURL: Bool = false
@@ -103,11 +104,14 @@ struct ContentView: View {
                                      roomUUID: rtcChannelId,
                                      region: region
                                  )
-                                 let whiteboardConfig = WhiteboardConfig(pptMix: usePptEffectMix, customUrl: useCustomWhiteboardURL ? customWhiteboardURL : nil)
+                                 let whiteboardConfig = WhiteboardConfig(usePcm: usePcm, customUrl: useCustomWhiteboardURL ? customWhiteboardURL : nil)
                                  NavigationView {
-                                     MainStageRepresentView(
-                                         config: .init(joinInfo: joinInfo, whiteboardConfig: whiteboardConfig, useWhiteboard: useWhiteboard)
-                                     )
+                                     Group {
+                                         MainStageRepresentView(
+                                             config: .init(joinInfo: joinInfo, whiteboardConfig: whiteboardConfig, useWhiteboard: useWhiteboard)
+                                         )
+                                     }
+
                                      .toolbar {
                                          ToolbarItemGroup(placement: .navigation) {
                                              Group {
@@ -254,7 +258,7 @@ struct ContentView: View {
         } icon: {
             Text("WhiteRoom region")
         }
-        Toggle("PptEffectMix", isOn: $usePptEffectMix)
+        Toggle("RawPCM", isOn: $usePcm)
         Toggle("UseWhiteboard", isOn: $useWhiteboard)
 
         Toggle("Custom WB URL", isOn: $useCustomWhiteboardURL)
@@ -263,7 +267,7 @@ struct ContentView: View {
                 .multilineTextAlignment(.trailing)
                 .onAppear {
                     if customWhiteboardURL.isEmpty {
-                        customWhiteboardURL = "http://10.6.0.90:8080"
+                        customWhiteboardURL = "http://10.6.0.55:8080"
                     }
                 }
         }
@@ -310,7 +314,7 @@ struct ContentView: View {
 
     func generateNewFromFlatDev(rtcOnly: Bool) {
         status = "Start reqeust"
-        var request = URLRequest(url: .init(string: "http://10.6.0.90:8888/create")!)
+        var request = URLRequest(url: .init(string: "http://10.6.0.55:8888/create")!)
         request.httpMethod = "POST"
         URLSession.shared.dataTask(with: request) { data, _, _ in
             DispatchQueue.main.async {

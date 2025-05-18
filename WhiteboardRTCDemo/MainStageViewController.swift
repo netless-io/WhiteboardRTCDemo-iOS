@@ -10,7 +10,7 @@ import UIKit
 import Whiteboard
 
 struct WhiteboardConfig {
-    let pptMix: Bool
+    let usePcm: Bool
     let customUrl: String?
 }
 
@@ -24,6 +24,8 @@ class MainStageViewController: UIViewController {
     let joinInfo: JoinInfo
     let whiteboardConfig: WhiteboardConfig
     var room: WhiteRoom?
+    var sampleRate = 48000, channel = 1, bitPerSample = 16, samples = 1440
+    lazy var pcmDataQueue = SafeQueue<Int16>(maxSize: samples * 10)
 
     init(config: MainStageViewConfig) {
         joinInfo = config.joinInfo
@@ -37,6 +39,12 @@ class MainStageViewController: UIViewController {
         config.appId = "a185de0a777f4c159e302abcc0f03b64"
         let agoraKit = AgoraRtcEngineKit.sharedEngine(with: config, delegate: self)
         agoraKit.setDefaultAudioRouteToSpeakerphone(true)
+        agoraKit.setAudioProfile(.default, scenario: .communication)
+        if self.whiteboardConfig.usePcm {
+            agoraKit.setParameters("{\"che.audio.start_debug_recording\":\"all\"}")
+            agoraKit.setParameters("{\"che.audio.echo.control.solo\": true}")
+            agoraKit.setAudioDataFrame(self)
+        }
         return agoraKit
     }()
 
@@ -55,6 +63,7 @@ class MainStageViewController: UIViewController {
     func destroy() {
         room?.disconnect()
         agoraKit.leaveChannel()
+        agoraKit.setAudioDataFrame(nil)
     }
 
     override func viewDidLoad() {
@@ -85,8 +94,13 @@ class MainStageViewController: UIViewController {
                 sdkConfig.useMultiViews = true
                 sdkConfig.log = true
                 sdkConfig.loggerOptions = ["printLevelMask": WhiteSDKLoggerOptionLevelKey.debug.rawValue]
-                let sdk = WhiteSDK(whiteBoardView: whiteboardView!, config: sdkConfig, commonCallbackDelegate: self, effectMixerBridgeDelegate: self.whiteboardConfig.pptMix ? self : nil)
-                return sdk
+                if whiteboardConfig.usePcm {
+                    let sdk = WhiteSDK(whiteBoardView: whiteboardView!, config: sdkConfig, commonCallbackDelegate: self, pcmDataDelegate: self)
+                    return sdk
+                } else {
+                    let sdk = WhiteSDK(whiteBoardView: whiteboardView!, config: sdkConfig, commonCallbackDelegate: self)
+                    return sdk
+                }
             }()
 
             view.addSubview(whiteboardView!)
@@ -155,84 +169,84 @@ extension MainStageViewController: AgoraRtcEngineDelegate, WhiteCommonCallbackDe
     func rtcEngine(_: AgoraRtcEngineKit, connectionChangedTo state: AgoraConnectionStateType, reason: AgoraConnectionChangedReason) {
         append(log: "/State/RTC Connect/ state: \(state.description) reason: \(reason.description)")
     }
+}
 
-    func rtcEngineDidAudioEffectFinish(_: AgoraRtcEngineKit, soundId: Int) {
-        sdk?.effectMixer?.setEffectFinished(soundId)
-    }
-
-    func rtcEngine(_: AgoraRtcEngineKit, didRequest info: AgoraRtcAudioFileInfo, error _: AgoraAudioFileInfoError) {
-        sdk?.effectMixer?.setEffectDurationUpdate(info.filePath, duration: Int(info.durationMs))
-    }
-
-    func rtcEngineDidAudioEffectStateChanged(_: AgoraRtcEngineKit, soundId: Int, state: AgoraAudioEffectStateCode) {
-        sdk?.effectMixer?.setEffectSoundId(soundId, stateChanged: state.rawValue)
-        print("/State/ soundId:\(soundId), state:\(state.rawValue)")
+extension MainStageViewController: WhiteAudioPcmDataDelegate {
+    func pcmDataUpdate(_ int16Array: [NSNumber]) {
+        if let array = int16Array as? [Int16] {
+            pcmDataQueue.enqueue(array)
+        }
     }
 }
 
-extension MainStageViewController: WhiteAudioEffectMixerBridgeDelegate {
-    func getEffectsVolume() -> Double {
-        agoraKit.getEffectsVolume()
+extension MainStageViewController: AgoraAudioDataFrameProtocol {
+    func onRecordAudioFrame(_: AgoraAudioFrame) -> Bool {
+        return true
     }
 
-    func setEffectsVolume(_ volume: Double) -> Int32 {
-        agoraKit.setEffectsVolume(volume)
+    func onMixedAudioFrame(_: AgoraAudioFrame) -> Bool {
+        return true
     }
 
-    func setVolumeOfEffect(_ soundId: Int32, withVolume volume: Double) -> Int32 {
-        agoraKit.setVolumeOfEffect(soundId, withVolume: volume)
+    func onPlaybackAudioFrame(beforeMixing _: AgoraAudioFrame, uid _: UInt) -> Bool {
+        return true
     }
 
-    func playEffect(_ soundId: Int32, filePath: String?, loopCount: Int32, pitch: Double, pan: Double, gain: Double, publish: Bool, startPos: Int32) -> Int32 {
-        agoraKit.playEffect(soundId, filePath: filePath, loopCount: loopCount, pitch: pitch, pan: pan, gain: gain, publish: publish, startPos: startPos)
+    func getObservedAudioFramePosition() -> AgoraAudioFramePosition {
+        return .playback
     }
 
-    func stopEffect(_ soundId: Int32) -> Int32 {
-        agoraKit.stopEffect(soundId)
+    func getMixedAudioParams() -> AgoraAudioParam {
+        let param = AgoraAudioParam()
+        param.channel = 1
+        param.mode = .readOnly
+        param.sampleRate = 44100
+        param.samplesPerCall = 1024
+        return param
     }
 
-    func stopAllEffects() -> Int32 {
-        agoraKit.stopAllEffects()
+    func getRecordAudioParams() -> AgoraAudioParam {
+        let param = AgoraAudioParam()
+        param.channel = 1
+        param.mode = .readOnly
+        param.sampleRate = 44100
+        param.samplesPerCall = 1024
+        return param
     }
 
-    func preloadEffect(_ soundId: Int32, filePath: String?) -> Int32 {
-        agoraKit.preloadEffect(soundId, filePath: filePath)
+    func getPlaybackAudioParams() -> AgoraAudioParam {
+        let param = AgoraAudioParam()
+        param.channel = channel
+        param.mode = .readWrite
+        param.sampleRate = sampleRate
+        param.samplesPerCall = samples * channel
+        return param
     }
 
-    func unloadEffect(_ soundId: Int32) -> Int32 {
-        agoraKit.unloadEffect(soundId)
-    }
-
-    func pauseEffect(_ soundId: Int32) -> Int32 {
-        agoraKit.pauseEffect(soundId)
-    }
-
-    func pauseAllEffects() -> Int32 {
-        agoraKit.pauseAllEffects()
-    }
-
-    func resumeEffect(_ soundId: Int32) -> Int32 {
-        agoraKit.resumeEffect(soundId)
-    }
-
-    func resumeAllEffects() -> Int32 {
-        agoraKit.resumeAllEffects()
-    }
-
-    func setEffectPosition(_ soundId: Int32, pos: Int) -> Int32 {
-        agoraKit.setEffectPosition(soundId, pos: pos)
-    }
-
-    func getEffectCurrentPosition(_ soundId: Int32) -> Int32 {
-        agoraKit.getEffectCurrentPosition(soundId)
-    }
-
-    func getEffectDuration(_ filePath: String) -> Int32 {
-        agoraKit.getEffectDuration(filePath)
+    func onPlaybackAudioFrame(_ frame: AgoraAudioFrame) -> Bool {
+        if let data = pcmDataQueue.dequeue(count: samples * channel) {
+            let count = data.count * MemoryLayout<Int16>.size
+            let data = Data(bytes: data, count: count)
+            data.withUnsafeBytes { (pcmBuffer: UnsafeRawBufferPointer) in
+                guard let addr = pcmBuffer.baseAddress else {
+                    memset(frame.buffer, 0, count)
+                    return
+                }
+                memcpy(frame.buffer, addr, count)
+            }
+            frame.samplesPerSec = sampleRate
+            frame.channels = channel
+            frame.bytesPerSample = bitPerSample / 8
+            frame.samplesPerChannel = samples
+        } else {
+            memset(frame.buffer, 0, samples * channel * 2)
+        }
+        return true
     }
 }
 
-extension AgoraConnectionStateType: CustomStringConvertible {
+
+extension AgoraConnectionStateType: @retroactive CustomStringConvertible {
     public var description: String {
         switch self {
         case .disconnected: "disconnected"
@@ -245,7 +259,7 @@ extension AgoraConnectionStateType: CustomStringConvertible {
     }
 }
 
-extension AgoraConnectionChangedReason: CustomStringConvertible {
+extension AgoraConnectionChangedReason: @retroactive CustomStringConvertible {
     public var description: String {
         switch self {
         case .connecting: "connecting"

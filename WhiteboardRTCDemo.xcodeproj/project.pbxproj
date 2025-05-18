@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		3A24E45C1D88D83650003B54 /* Pods_WhiteboardRTCDemo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B1131F6C980946D95F9ED72C /* Pods_WhiteboardRTCDemo.framework */; };
+		8A0F27CE2CA1459600160EBE /* AgoraPcmSourcePush.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A0F27CD2CA1459600160EBE /* AgoraPcmSourcePush.swift */; };
+		8A0F28302CA555E800160EBE /* SafeQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A0F282F2CA555E800160EBE /* SafeQueue.swift */; };
 		8A5BA4ED2B6C976700D531E9 /* WhiteboardRTCDemoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A5BA4EC2B6C976700D531E9 /* WhiteboardRTCDemoApp.swift */; };
 		8A5BA4EF2B6C976700D531E9 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A5BA4EE2B6C976700D531E9 /* ContentView.swift */; };
 		8A5BA4F12B6C976800D531E9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8A5BA4F02B6C976800D531E9 /* Assets.xcassets */; };
@@ -17,6 +19,8 @@
 
 /* Begin PBXFileReference section */
 		1ED8E3E7FFCFD468D530B658 /* Pods-WhiteboardRTCDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-WhiteboardRTCDemo.release.xcconfig"; path = "Target Support Files/Pods-WhiteboardRTCDemo/Pods-WhiteboardRTCDemo.release.xcconfig"; sourceTree = "<group>"; };
+		8A0F27CD2CA1459600160EBE /* AgoraPcmSourcePush.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgoraPcmSourcePush.swift; sourceTree = "<group>"; };
+		8A0F282F2CA555E800160EBE /* SafeQueue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafeQueue.swift; sourceTree = "<group>"; };
 		8A5BA4E92B6C976700D531E9 /* WhiteboardRTCDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WhiteboardRTCDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8A5BA4EC2B6C976700D531E9 /* WhiteboardRTCDemoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhiteboardRTCDemoApp.swift; sourceTree = "<group>"; };
 		8A5BA4EE2B6C976700D531E9 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -71,6 +75,9 @@
 			children = (
 				8A5BA4EC2B6C976700D531E9 /* WhiteboardRTCDemoApp.swift */,
 				8A5BA4FA2B6CD0FD00D531E9 /* MainStageViewController.swift */,
+				8A0F282F2CA555E800160EBE /* SafeQueue.swift */,
+				8A0F27CD2CA1459600160EBE /* AgoraPcmSourcePush.swift */,
+				8AE235882C6DDEAE00BDAFA1 /* libs */,
 				8A5BA4EE2B6C976700D531E9 /* ContentView.swift */,
 				8A5BA4F02B6C976800D531E9 /* Assets.xcassets */,
 				8A5BA4F22B6C976800D531E9 /* Preview Content */,
@@ -210,6 +217,8 @@
 			files = (
 				8A5BA4EF2B6C976700D531E9 /* ContentView.swift in Sources */,
 				8A5BA4ED2B6C976700D531E9 /* WhiteboardRTCDemoApp.swift in Sources */,
+				8A0F27CE2CA1459600160EBE /* AgoraPcmSourcePush.swift in Sources */,
+				8A0F28302CA555E800160EBE /* SafeQueue.swift in Sources */,
 				8A5BA4FB2B6CD0FD00D531E9 /* MainStageViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
