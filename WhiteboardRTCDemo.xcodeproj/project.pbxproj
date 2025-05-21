@@ -77,7 +77,6 @@
 				8A5BA4FA2B6CD0FD00D531E9 /* MainStageViewController.swift */,
 				8A0F282F2CA555E800160EBE /* SafeQueue.swift */,
 				8A0F27CD2CA1459600160EBE /* AgoraPcmSourcePush.swift */,
-				8AE235882C6DDEAE00BDAFA1 /* libs */,
 				8A5BA4EE2B6C976700D531E9 /* ContentView.swift */,
 				8A5BA4F02B6C976800D531E9 /* Assets.xcassets */,
 				8A5BA4F22B6C976800D531E9 /* Preview Content */,

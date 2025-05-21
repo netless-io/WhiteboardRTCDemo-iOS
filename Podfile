@@ -7,8 +7,9 @@ target 'WhiteboardRTCDemo' do
 
   # Pods for WhiteboardRTCDemo
 
-pod 'Whiteboard', '2.16.88'
-pod 'AgoraRtcEngine_Special_iOS', '3.7.2.129.1'
-pod 'Zip'
+  pod 'Whiteboard', '2.16.115'
+  pod 'AgoraRtcEngine_iOS', '3.7.2'
+  pod 'Zip'
+  pod 'SnapKit'
 
 end
