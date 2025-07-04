@@ -13,7 +13,6 @@
 		8A5BA4ED2B6C976700D531E9 /* WhiteboardRTCDemoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A5BA4EC2B6C976700D531E9 /* WhiteboardRTCDemoApp.swift */; };
 		8A5BA4EF2B6C976700D531E9 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A5BA4EE2B6C976700D531E9 /* ContentView.swift */; };
 		8A5BA4F12B6C976800D531E9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8A5BA4F02B6C976800D531E9 /* Assets.xcassets */; };
-		8A5BA4F42B6C976800D531E9 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8A5BA4F32B6C976800D531E9 /* Preview Assets.xcassets */; };
 		8A5BA4FB2B6CD0FD00D531E9 /* MainStageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A5BA4FA2B6CD0FD00D531E9 /* MainStageViewController.swift */; };
 /* End PBXBuildFile section */
 
@@ -25,7 +24,6 @@
 		8A5BA4EC2B6C976700D531E9 /* WhiteboardRTCDemoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhiteboardRTCDemoApp.swift; sourceTree = "<group>"; };
 		8A5BA4EE2B6C976700D531E9 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		8A5BA4F02B6C976800D531E9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		8A5BA4F32B6C976800D531E9 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		8A5BA4FA2B6CD0FD00D531E9 /* MainStageViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainStageViewController.swift; sourceTree = "<group>"; };
 		ADFB244782E968128D20C7E1 /* Pods-WhiteboardRTCDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-WhiteboardRTCDemo.debug.xcconfig"; path = "Target Support Files/Pods-WhiteboardRTCDemo/Pods-WhiteboardRTCDemo.debug.xcconfig"; sourceTree = "<group>"; };
 		B1131F6C980946D95F9ED72C /* Pods_WhiteboardRTCDemo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_WhiteboardRTCDemo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -52,6 +50,13 @@
 			path = Pods;
 			sourceTree = "<group>";
 		};
+		61E4E3EF2E04036D00C4186F /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
 		8A5BA4E02B6C976700D531E9 = {
 			isa = PBXGroup;
 			children = (
@@ -73,23 +78,15 @@
 		8A5BA4EB2B6C976700D531E9 /* WhiteboardRTCDemo */ = {
 			isa = PBXGroup;
 			children = (
+				61E4E3EF2E04036D00C4186F /* Preview Content */,
 				8A5BA4EC2B6C976700D531E9 /* WhiteboardRTCDemoApp.swift */,
 				8A5BA4FA2B6CD0FD00D531E9 /* MainStageViewController.swift */,
 				8A0F282F2CA555E800160EBE /* SafeQueue.swift */,
 				8A0F27CD2CA1459600160EBE /* AgoraPcmSourcePush.swift */,
 				8A5BA4EE2B6C976700D531E9 /* ContentView.swift */,
 				8A5BA4F02B6C976800D531E9 /* Assets.xcassets */,
-				8A5BA4F22B6C976800D531E9 /* Preview Content */,
 			);
 			path = WhiteboardRTCDemo;
-			sourceTree = "<group>";
-		};
-		8A5BA4F22B6C976800D531E9 /* Preview Content */ = {
-			isa = PBXGroup;
-			children = (
-				8A5BA4F32B6C976800D531E9 /* Preview Assets.xcassets */,
-			);
-			path = "Preview Content";
 			sourceTree = "<group>";
 		};
 		F4C64DCE6DE4700659F2EEC4 /* Frameworks */ = {
@@ -160,7 +157,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8A5BA4F42B6C976800D531E9 /* Preview Assets.xcassets in Resources */,
 				8A5BA4F12B6C976800D531E9 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -176,9 +172,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-WhiteboardRTCDemo/Pods-WhiteboardRTCDemo-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-WhiteboardRTCDemo/Pods-WhiteboardRTCDemo-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -365,7 +365,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -400,7 +400,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

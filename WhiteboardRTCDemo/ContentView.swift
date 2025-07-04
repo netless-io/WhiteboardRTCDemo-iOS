@@ -10,6 +10,7 @@ import SwiftUI
 import Whiteboard
 import Zip
 
+let defaultLocalServer = "http://vince-mac.local"
 let zipUrl = FileManager.default.temporaryDirectory.appendingPathComponent("agoralog.zip")
 
 struct MainStageRepresentView: UIViewControllerRepresentable {
@@ -104,29 +105,31 @@ struct ContentView: View {
                                      roomUUID: rtcChannelId,
                                      region: region
                                  )
+                                                         
                                  let whiteboardConfig = WhiteboardConfig(usePcm: usePcm, customUrl: useCustomWhiteboardURL ? customWhiteboardURL : nil)
                                  NavigationView {
-                                     Group {
-                                         MainStageRepresentView(
-                                             config: .init(joinInfo: joinInfo, whiteboardConfig: whiteboardConfig, useWhiteboard: useWhiteboard)
-                                         )
-                                     }
-
+                                     MainStageRepresentView(
+                                         config: .init(joinInfo: joinInfo, whiteboardConfig: whiteboardConfig, useWhiteboard: useWhiteboard)
+                                     )
                                      .toolbar {
                                          ToolbarItemGroup(placement: .navigation) {
                                              Group {
                                                  Button("Close") {
                                                      showMainStage = false
                                                  }
-                                                 Button("Copy Web Link") {
-                                                     UIPasteboard.general.string = "https://demo.whiteboard.agora.io/room/\(joinInfo.whiteboardRoomUUID)?token=\(joinInfo.whiteboardRoomToken)&region=\(joinInfo.region)"
+                                                 if #available(iOS 16.0, *) {
+                                                     ShareLink(item: "https://demo.whiteboard.agora.io/room/\(joinInfo.whiteboardRoomUUID)?token=\(joinInfo.whiteboardRoomToken)&region=\(joinInfo.region)") {
+                                                                                                          Text("ShareLink")
+                                                                                                      }
                                                  }
-                                             }.foregroundColor(.blue)
+                                             }
+                                             .foregroundColor(.blue)
                                          }
                                      }
                                  }
                              })
-        }.padding(.horizontal)
+        }
+        .padding(.horizontal)
 
         HStack {
             if #available(iOS 16.0, *) {
@@ -267,7 +270,7 @@ struct ContentView: View {
                 .multilineTextAlignment(.trailing)
                 .onAppear {
                     if customWhiteboardURL.isEmpty {
-                        customWhiteboardURL = "http://10.6.0.55:8080"
+                        customWhiteboardURL = "\(defaultLocalServer):8080"
                     }
                 }
         }
@@ -314,7 +317,7 @@ struct ContentView: View {
 
     func generateNewFromFlatDev(rtcOnly: Bool) {
         status = "Start reqeust"
-        var request = URLRequest(url: .init(string: "http://10.6.0.55:8888/create")!)
+        var request = URLRequest(url: .init(string: "\(defaultLocalServer):8888/create")!)
         request.httpMethod = "POST"
         URLSession.shared.dataTask(with: request) { data, _, _ in
             DispatchQueue.main.async {
